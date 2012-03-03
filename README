@@ -1,0 +1,291 @@
+========================================================================
+| Integration of Loop Quantum Cosmology Equations for Bianchi I and II |
+========================================================================
+
+=========================================================================
+README
+=========================================================================
+
+    Copyright (C) 2012  Edison Montoya, eamonto@gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Up to date: 3 Mar 2012					
+
+=========================================================================
+
+
+This is a readme for the program that solves the Bianchi I and II equations,
+classical and effective ones, without potential or with inflationary 
+and cyclic potentials. In the context of Loop Quantum Cosmology. Here it is 
+specified how use the program, the archives and the functions.
+
+In order to the program works you need:
+1) C compiler, example: gcc
+2) make -GNU make utility to maintain groups of programs
+3) Python and the package "Tkinter"
+
+
+* An easier way to work with the program is execute the command
+  $make
+
+This compilate the program and open a window where can be change the
+program parameters, next you press the button "calculate" and this
+run the program. You can see the result in the "output" file.
+Note: for this you need to have installed python and the package "Tkinter"
+
+If you want to do these step one by one then:
+
+* The COMPILATION is make with gcc, execute the command 
+
+$make exec.out
+
+This generates the archive exec.out
+
+* The EXECUTION is like this
+
+$./exec.out <parameterfile> <outputfile>
+
+
+exec.out          --> Executable
+
+<parameterfile>   --> Have the parameters for the program (param.txt)
+
+<outputfile>      --> Name of the output file
+
+
+* An easy way to execute the program is running the command
+
+$make run
+
+This run the program exec.out
+
+
+* The OUTPUT of the program is print into the output directory 
+specified in the Makefile (or when you run the program using the
+interactive interface). The archives are:
+
+a123.t       ---> Contains the evolution of the scale factors, it is written as:
+	            time, aprom, a1, a2, a3
+
+cp.t         ---> Contains the evolution of the connections and the triads,
+	          it is written as:
+	            time, c1, c2, c3, p1, p2, p3, c1*mu1, c2*mu2, c3*mu3
+
+H123.t       ---> Contains the evolution of the Hubble parameters, 
+	     	          it is written as:
+	            time, H1, H2, H3
+
+kasner.t     ---> Contains the evolution of the Kasner parameters, 
+	          it is written as:
+	            time, k1, k2, k3
+
+expansion.t  ---> Evolution of the expansion, written as:
+	     	    time, expansion
+
+constraint.t ---> Evolution of the constraint relative error, written as:
+	     	    time, constraint relative error
+
+constants.t  ---> Evolution of the constants of motion, written as:
+	            time, P_phi, density parameter, shear parameter, 
+		    curvature parameter, c3p3-c2p2
+ 
+density.t    ---> Evolution of the density, written as:
+	     	    time, density/critical_density
+  
+shear.t     ---> Evolution of the shear, written as:
+	     	    time, shear
+
+Ricci.t      ---> Contains the evolution of the Ricci scalar, it is written as:
+		    time, Ricci scalar
+
+volume.t     ---> Contains the evolution of the volume, it is written as:
+		    time, volume
+
+potential.t  ---> Evolution of scalar field and potential (it is only
+	     	  generated when is turn on the potential), written as:
+	            time, phi, phi derivative, potential, potential derivative
+
+param.txt    ---> It is a copy of the archive with the parameters.
+
+
+------------------------------------------------------------------------
+
+Now is describe the archives contained in this directory and the role 
+that they play in the solution of the problem.
+
+
+=========================================================================
+param.txt
+=========================================================================
+Have the program parameters: 
+
+1.0    <-- mu1c1
+1.0    <-- mu2c2
+1.0    <-- mu3c3
+
+1.0    <-- p1
+1.0    <-- p2
+1.0    <-- p3
+
+1.0    <-- phi
+
+1.0e-9 <-- Tolerance Error (for the adaptive RK)
+100    <-- Maximal Number of Iterations (for the adaptive RK)
+
+0.0    <-- Initial Time
+1.0    <-- Final Time
+1.0e-4 <-- Time Step
+
+1      <-- Number of time steps for write the output
+
+1      <-- 0 = RK4,  1 = RKF,  2 = RK-CK
+1.0    <-- 0.0 = Bianchi I,  1.0 = Bianchi II
+0      <-- 0 = Internal Time (N=V),  1 = Cosmic Time (N=1)
+1      <-- 0 = Classical,  1 = Effective
+
+1      <-- Standart output; 0 = Off,  1 = On
+
+0      <-- Potential switch; 0 = Off,  1 = On
+0      <-- Potential Selection, 0 = Inflationary, 1 = Cyclic
+
+0      <-- Field Mass
+0      <-- Field Interaction Constant (phi**4 term)
+
+0      <-- V_0 parameter     (Cyclic potential)
+0      <-- sigma_1 parameter (Cyclic potential)
+0      <-- sigma_2 parameter (Cyclic potential)
+
+
+
+=========================================================================
+header.h
+=========================================================================
+This is the head of the program, here the global variables 
+are declared. The program was developed with three different 
+integrators: RK4, RK-Felberg and RK-Cash-Karp. These methods 
+are implemented in rk4.c and rk45.c files, respectively.
+
+
+
+=========================================================================
+main.c
+=========================================================================
+Principal routine, it coordinates all the program in order to solve
+the problem.
+
+
+
+=========================================================================
+initialize.c
+=========================================================================
+Initialization of all quantities, including the parameters for
+the adaptive methods (Fehlberg and Cash-Karp). The routines are:
+
+////// INITIALIZATION OF ALL QUANTITIES
+int initialize_all(void);
+
+
+
+=========================================================================
+io_lib.c
+=========================================================================
+Contains:
+-> The input-output routines.
+-> The create and remove files routines.
+-> Usage message routine.
+The routines are:
+
+///// REMOVE ARCHIVE outputfile AND CREATE IT AGAIN
+int create_remove_dir(void);
+
+///// VERIFICATION OF INPUT FILES
+int usage(void);
+
+///// CHECK IF THE INITIAL CONDITIONS ARE CORRECT
+int check_initial_data(void);
+
+///// READ THE PARAMETERS
+int read_param(void);
+
+///// WRITE THE OBSERVABLES TO A FILE
+int write_output(void);
+
+
+
+=========================================================================
+rk4.c
+=========================================================================
+Implementation of the Runge-Kutta 4 method. The routines are:
+
+///// STORE THE CONDITIONS BEFORE THE INTEGRATION
+int store_levels_rk4(void);
+
+///// EVOLUTION WITH THE RK4 METHOD
+int evolution_rk4(int k);
+
+
+
+=========================================================================
+rk45.c
+=========================================================================
+The Adaptive Runge-Kutta method are implemented here. The method
+is a RK45 which means that there are two Runge-Kutta of order 4 and 5.
+These kind of methods are the Runge-Kutta-Fehlberg and the
+Runge-Kutta-Cash-Karp. The routines are:
+
+///// STORE THE CONDITIONS BEFORE THE INTEGRATION
+int store_levels_rk45(void);
+
+///// FINAL VALUES AFTER INTEGRATION
+int step_rk45(int i);
+
+///// EVOLUTION WITH THE ADAPTIVE METHOD
+int evolution_rk45(int i);
+
+///// RELATIVE ERROR BETWEEN THE RK4 AND RK5 METHODS
+int error_rk45(void);
+
+
+
+=========================================================================
+observables.c
+=========================================================================
+Here are computed all the quantities that can give relevant 
+information about the system dynamics. The routines are:
+
+////// SCALAR FIELD POTENTIAL
+double potential(void);
+
+////// DERIVATE SCALAR FIELD POTENTIAL
+double dev_pot();
+
+////// SCALAR FIELD MOMENTUM
+double field_momentum(void);
+
+////// COMPUTE OBSERVABLES
+int compute_obs(void);
+
+
+
+=========================================================================
+sources.c
+=========================================================================
+Here are implemented the right hand side of the equations 
+that we want to integrate. The routines are:
+
+///// RIGHT HAND SIDE
+int rhs(void);
+
